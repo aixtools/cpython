@@ -1236,9 +1236,22 @@ compiling/linking a program, and when the program is run.
 
 The purpose of the :func:`find_library` function is to locate a library in a way
 similar to what the compiler or runtime loader does (on platforms with several
-versions of a shared library the most recent should be loaded), while the ctypes
-library loaders act like when a program is run, and call the runtime loader
-directly.
+versions of a shared library the most recent should be loaded).
+Note: the what is found using -lFOO (by the linker/compiler) may be more restrictive
+than what a run-time-loader (rtld) looks for. The loader/linker (ld)
+uses flags such as -L/where/to/look and -lNAME while rtld has it's own
+process for searching directories - which might be expanded using an
+environment varaible (e.g., on Linux and AIX the environment
+variable ``LD_LIBRARY_PATH`` can be used to expand the directories
+that are examined by rtld.
+
+The ctypes library loaders `cdll.LoadLibrary()` or `CDLL()` call
+`dlopen()` which uses the rtld to locate the shared library to be loaded into python.
+
+The result returned by `find_libary` is system dependent (see below) as
+Windows, Mac/OS, Linux, Solaris, HPUX and AIX have different conventions.
+However, the result returned can be used by `cdll.LoadLibrary()` to
+load the library name found.
 
 The :mod:`ctypes.util` module provides a function which can help to determine
 the library to load.
@@ -1248,16 +1261,22 @@ the library to load.
    :module: ctypes.util
    :noindex:
 
-   Try to find a library and return a pathname.  *name* is the library name without
-   any prefix like *lib*, suffix like ``.so``, ``.dylib`` or version number (this
-   is the form used for the posix linker option :option:`!-l`).  If no library can
-   be found, returns ``None``.
+   Try to find a library and return a filename (some platforms include the path).
+   *name* is the library name without any prefix like *lib*, suffix like ``.so``,
+   ``.dylib`` or version number (this is the form used for the posix linker option
+   :option:`!-l`).  If no library can be found, returns ``None``.
 
 The exact functionality is system dependent.
 
 On Linux, :func:`find_library` tries to run external programs
 (``/sbin/ldconfig``, ``gcc``, ``objdump`` and ``ld``) to find the library file.
 It returns the filename of the library file.
+
+On AIX, :func:`find_library` runs the external program
+``/usr/bin/dump`` to to examine the python executable for directories to search
+and examine archives (``.a`` files) for archive members that can be loaded.
+If a archive with a suitable member cannot be found a directory search is done
+looking for a file named ``lib**FOO**.so``. See below for examples.
 
 .. versionchanged:: 3.6
    On Linux, the value of the environment variable ``LD_LIBRARY_PATH`` is used
@@ -1288,14 +1307,33 @@ to locate the library, and returns a full pathname if successful::
    '/System/Library/Frameworks/AGL.framework/AGL'
    >>>
 
+like OS X, the AIX implementation of :func:`find_library` tries several naming schemes.
+The default paths used to locate the library comes from the executable
+and returns the filename if successful::
+
+   >>> from ctypes.util import find_library
+   >>> find_library("m")
+   >>> find_library("c")
+   'libc.a(shr.o)'
+   >>> find_library("ssl")
+   'libssl.a(libssl.so)'
+   >>> find_library("z")
+   'libz.a(libz.so.1.2.11)'
+   >>> find_library("rpm")
+   'librpm.so'
+   >>>
+
 On Windows, :func:`find_library` searches along the system search path, and
 returns the full pathname, but since there is no predefined naming scheme a call
 like ``find_library("c")`` will fail and return ``None``.
 
-If wrapping a shared library with :mod:`ctypes`, it *may* be better to determine
+If wrapping a shared library with :mod:`ctypes`, it *may* be necessary to determine
 the shared library name at development time, and hardcode that into the wrapper
 module instead of using :func:`find_library` to locate the library at runtime.
-
+Two generic cases: 1) when a specific version is required (libc.so.6 or libc.so.7)
+or libz.a(libz.so.1.2.8),
+and 2) on AIX when the archive name and the member are not the same (e.g.,
+libcrypto_compat.a(libcrypto.so) or libcrypto_compat.a(libcrypto.so.0.9.8)). 
 
 .. _ctypes-loading-shared-libraries:
 
@@ -1384,13 +1422,18 @@ copy of the windows error code.
    Flag to use as *mode* parameter.  On platforms where this flag is not available,
    it is defined as the integer zero.
 
-
 .. data:: RTLD_LOCAL
    :noindex:
 
    Flag to use as *mode* parameter.  On platforms where this is not available, it
    is the same as *RTLD_GLOBAL*.
 
+.. data:: os.RTLD_MEMBER
+   :noindex:
+
+   Flag to use as *mode* parameter to indicate the shared library is a member of an archive
+   rather than a file in a directory.  On platforms where this is not available, it
+   is an error.
 
 .. data:: DEFAULT_MODE
    :noindex:
@@ -1405,7 +1448,9 @@ accessing it repeatedly returns the same object each time.  On the other hand,
 accessing it through an index returns a new object each time::
 
    >>> from ctypes import CDLL
-   >>> libc = CDLL("libc.so.6")  # On Linux
+   >>> libc = CDLL("libc.so.6")                      # On Linux
+   >>> import os                                     # on AIX
+   >>> libc = CDLL("libc.a(shr.o)", os.RTLD_MEMBER)  # On AIX
    >>> libc.time == libc.time
    True
    >>> libc['time'] == libc['time']
