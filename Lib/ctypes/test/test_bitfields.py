@@ -40,6 +40,9 @@ class C_Test(unittest.TestCase):
                 self.assertEqual(getattr(b, name), func(byref(b), name.encode('ascii')))
 
     def test_shorts(self):
+        b = BITS()
+        if func(byref(b), "M") == 999:
+            self.skipTest("Compiler does not support signed short bitfields")
         for i in range(256):
             for name in "MNOPQRS":
                 b = BITS()
