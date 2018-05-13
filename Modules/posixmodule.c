@@ -12346,6 +12346,9 @@ INITFUNC(void)
     Py_INCREF(&SchedParamType);
     PyModule_AddObject(m, "sched_param", (PyObject *)&SchedParamType);
 #endif
+#if HAVE_DECL_RTLD_MEMBER
+    if (PyModule_AddIntMacro(m, RTLD_MEMBER)) return -1;
+#endif
 
     times_result_desc.name = MODNAME ".times_result";
     if (PyStructSequence_InitType2(&TimesResultType, &times_result_desc) < 0)
