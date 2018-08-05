@@ -22,6 +22,7 @@ Lib/lib2to3/*.pickle
 Lib/test/data/*
 Lib/_sysconfigdata.py
 Lib/plat-mac/errors.rsrc.df.rsrc
+Lib/plat-aix6/
 Makefile
 Makefile.pre
 Misc/python.pc
@@ -31,6 +32,7 @@ Modules/Setup.config
 Modules/Setup.local
 Modules/config.c
 Modules/ld_so_aix
+Modules/python.exp
 Modules/_freeze_importlib
 Modules/_testembed
 PCbuild/*.bsc
