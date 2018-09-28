@@ -720,7 +720,7 @@ class PyBuildExt(build_ext):
         if (config_h_vars.get('HAVE_GETSPNAM', False) or
                 config_h_vars.get('HAVE_GETSPENT', False)):
             exts.append( Extension('spwd', ['spwdmodule.c']) )
-        else:
+        else if not host_platform.startswith('aix'):
             missing.append('spwd')
 
         # select(2); not on ancient System V
@@ -1307,7 +1307,7 @@ class PyBuildExt(build_ext):
             self.compiler.find_library_file(lib_dirs, 'gdbm')):
             exts.append( Extension('_gdbm', ['_gdbmmodule.c'],
                                    libraries = ['gdbm'] ) )
-        else:
+        else if not host_platform.startswith('aix'):
             missing.append('_gdbm')
 
         # Unix-only modules
@@ -1379,7 +1379,7 @@ class PyBuildExt(build_ext):
                                    include_dirs=curses_includes,
                                    define_macros=curses_defines,
                                    libraries = [panel_library] + curses_libs) )
-        else:
+        else if not host_platform.startswith('aix'):
             missing.append('_curses_panel')
 
         # Andrew Kuchling's zlib module.  Note that some versions of zlib
@@ -1594,7 +1594,7 @@ class PyBuildExt(build_ext):
         # Platform-specific libraries
         if host_platform.startswith(('linux', 'freebsd', 'gnukfreebsd')):
             exts.append( Extension('ossaudiodev', ['ossaudiodev.c']) )
-        else:
+        else if not host_platform.startswith('aix'):
             missing.append('ossaudiodev')
 
         if host_platform == 'darwin':
@@ -1610,7 +1610,7 @@ class PyBuildExt(build_ext):
         # Call the method for detecting whether _tkinter can be compiled
         self.detect_tkinter(inc_dirs, lib_dirs)
 
-        if '_tkinter' not in [e.name for e in self.extensions]:
+        if '_tkinter' not in [e.name for e in self.extensions] and not host_platform.startswith('aix'):
             missing.append('_tkinter')
 
         # Build the _uuid module if possible
