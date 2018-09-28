@@ -720,7 +720,7 @@ class PyBuildExt(build_ext):
         if (config_h_vars.get('HAVE_GETSPNAM', False) or
                 config_h_vars.get('HAVE_GETSPENT', False)):
             exts.append( Extension('spwd', ['spwdmodule.c']) )
-        else if not host_platform.startswith('aix'):
+        elif not host_platform.startswith('aix'):
             missing.append('spwd')
 
         # select(2); not on ancient System V
@@ -843,7 +843,7 @@ class PyBuildExt(build_ext):
                                    library_dirs=['/usr/lib/termcap'],
                                    extra_link_args=readline_extra_link_args,
                                    libraries=readline_libs) )
-        else:
+        elif not host_platform.startswith('aix'):
             missing.append('readline')
 
         # crypt module.
@@ -1223,7 +1223,7 @@ class PyBuildExt(build_ext):
                                   library_dirs=sqlite_libdir,
                                   extra_link_args=sqlite_extra_link_args,
                                   libraries=["sqlite3",]))
-        else:
+        elif not host_platform.startswith('aix'):
             missing.append('_sqlite3')
 
         dbm_setup_debug = False   # verbose debug prints from this script?
@@ -1307,7 +1307,7 @@ class PyBuildExt(build_ext):
             self.compiler.find_library_file(lib_dirs, 'gdbm')):
             exts.append( Extension('_gdbm', ['_gdbmmodule.c'],
                                    libraries = ['gdbm'] ) )
-        else if not host_platform.startswith('aix'):
+        elif not host_platform.startswith('aix'):
             missing.append('_gdbm')
 
         # Unix-only modules
@@ -1379,7 +1379,7 @@ class PyBuildExt(build_ext):
                                    include_dirs=curses_includes,
                                    define_macros=curses_defines,
                                    libraries = [panel_library] + curses_libs) )
-        else if not host_platform.startswith('aix'):
+        elif not host_platform.startswith('aix'):
             missing.append('_curses_panel')
 
         # Andrew Kuchling's zlib module.  Note that some versions of zlib
@@ -1594,7 +1594,7 @@ class PyBuildExt(build_ext):
         # Platform-specific libraries
         if host_platform.startswith(('linux', 'freebsd', 'gnukfreebsd')):
             exts.append( Extension('ossaudiodev', ['ossaudiodev.c']) )
-        else if not host_platform.startswith('aix'):
+        elif not host_platform.startswith('aix'):
             missing.append('ossaudiodev')
 
         if host_platform == 'darwin':
@@ -1810,11 +1810,12 @@ class PyBuildExt(build_ext):
             tcl_includes = find_file('tcl.h', inc_dirs, tcl_include_sub)
             tk_includes = find_file('tk.h', inc_dirs, tk_include_sub)
 
-        if (tcllib is None or tklib is None or
-            tcl_includes is None or tk_includes is None):
-            self.announce("INFO: Can't locate Tcl/Tk libs and/or headers", 2)
+            if (tcllib is None or tklib is None or
+                tcl_includes is None or tk_includes is None):
+                self.announce("INFO: Can't locate Tcl/Tk libs and/or headers", 2)
+                return
+        else:
             return
-
         # OK... everything seems to be present for Tcl/Tk.
 
         include_dirs = [] ; libs = [] ; defs = [] ; added_lib_dirs = []
