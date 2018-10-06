@@ -46,7 +46,7 @@ def status(message, modal=False, info=None):
 
 def get_git_branch():
     """Get the symbolic name for the current git branch"""
-    cmd = "git rev-parse --abbrev-ref HEAD".split()
+    cmd = ("git -C %s rev-parse --abbrev-ref HEAD" % SRCDIR).split()
     try:
         return subprocess.check_output(cmd, stderr=subprocess.DEVNULL)
     except subprocess.CalledProcessError:
@@ -58,7 +58,7 @@ def get_git_upstream_remote():
 
     Uses "upstream" if it exists, "origin" otherwise
     """
-    cmd = "git remote get-url upstream".split()
+    cmd = ("git -C %s remote get-url upstream" % SRCDIR).split()
     try:
         subprocess.check_output(cmd, stderr=subprocess.DEVNULL)
     except subprocess.CalledProcessError:
@@ -94,9 +94,9 @@ def changed_files(base_branch=None):
         #  directory = normal git checkout/clone
         #  file = git worktree directory
         if base_branch:
-            cmd = 'git diff --name-status ' + base_branch
+            cmd = 'git -C %s diff --name-status ' % SRCDIR + base_branch
         else:
-            cmd = 'git status --porcelain'
+            cmd = 'git -C %s status --porcelain' % SRCDIR
         filenames = []
         with subprocess.Popen(cmd.split(), stdout=subprocess.PIPE) as st:
             for line in st.stdout:
