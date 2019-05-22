@@ -1923,6 +1923,10 @@ yes)
 
 *)
     case $ac_sys_system in
+    AIX)
+        # Need to be sure _THREAD_SAFE is defined
+	BASECFLAGS="$BASECFLAGS -D_THREAD_SAFE=1"
+	;;
     OpenUNIX*|UnixWare*)
 	BASECFLAGS="$BASECFLAGS -K pentium,host,inline,loop_unroll,alloca "
 	;;

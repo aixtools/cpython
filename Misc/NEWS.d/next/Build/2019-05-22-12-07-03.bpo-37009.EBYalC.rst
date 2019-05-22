@@ -1,0 +1,2 @@
+Ensure that _THREAD_SAFE is always defined on AIX, per documentation for pthread.h
+patch by M. Felt

@@ -7492,6 +7492,10 @@ $as_echo "$MACOSX_DEPLOYMENT_TARGET" >&6; }
 
 *)
     case $ac_sys_system in
+    AIX)
+        # Need to be sure _THREAD_SAFE is defined
+	BASECFLAGS="$BASECFLAGS -D_THREAD_SAFE=1"
+	;;
     OpenUNIX*|UnixWare*)
 	BASECFLAGS="$BASECFLAGS -K pentium,host,inline,loop_unroll,alloca "
 	;;
@@ -10212,7 +10216,6 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
-
 
 
 
