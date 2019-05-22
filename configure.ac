@@ -1923,10 +1923,6 @@ yes)
 
 *)
     case $ac_sys_system in
-    AIX)
-        # Need to be sure _THREAD_SAFE is defined
-	BASECFLAGS="$BASECFLAGS -D_THREAD_SAFE=1"
-	;;
     OpenUNIX*|UnixWare*)
 	BASECFLAGS="$BASECFLAGS -K pentium,host,inline,loop_unroll,alloca "
 	;;
@@ -1936,6 +1932,11 @@ yes)
     esac
     ;;
 esac
+
+dnl Need to be sure _THREAD_SAFE is defined per AIX pthread.h documentation
+if test "$ac_sys_system" == 'AIX'; then
+    BASECFLAGS="$BASECFLAGS -D_THREAD_SAFE=1"
+fi
 
 # ICC needs -fp-model strict or floats behave badly
 case "$CC" in

@@ -7492,10 +7492,6 @@ $as_echo "$MACOSX_DEPLOYMENT_TARGET" >&6; }
 
 *)
     case $ac_sys_system in
-    AIX)
-        # Need to be sure _THREAD_SAFE is defined
-	BASECFLAGS="$BASECFLAGS -D_THREAD_SAFE=1"
-	;;
     OpenUNIX*|UnixWare*)
 	BASECFLAGS="$BASECFLAGS -K pentium,host,inline,loop_unroll,alloca "
 	;;
@@ -7505,6 +7501,10 @@ $as_echo "$MACOSX_DEPLOYMENT_TARGET" >&6; }
     esac
     ;;
 esac
+
+if test "$ac_sys_system" == 'AIX'; then
+    BASECFLAGS="$BASECFLAGS -D_THREAD_SAFE=1"
+fi
 
 # ICC needs -fp-model strict or floats behave badly
 case "$CC" in
