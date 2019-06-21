@@ -107,6 +107,13 @@ corresponding Unix manual entries for more information on calls.");
 
 #ifdef HAVE_SYS_SENDFILE_H
 #include <sys/sendfile.h>
+/*
+ * the name for sendfile() is send_file() on AIX 
+ * define HAVE_SENDFILE here to use the existing HAVE_SENDFILE related macros
+ */
+#if defined(_AIX) && defined(HAVE_SEND_FILE)
+#define HAVE_SENDFILE
+#endif
 #endif
 
 #if defined(__APPLE__)
@@ -133,7 +140,7 @@ corresponding Unix manual entries for more information on calls.");
 #include <sys/xattr.h>
 #endif
 
-#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__APPLE__)
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__APPLE__) || defined(_AIX)
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
@@ -8636,7 +8643,7 @@ os_read_impl(PyObject *module, int fd, Py_ssize_t length)
 }
 
 #if (defined(HAVE_SENDFILE) && (defined(__FreeBSD__) || defined(__DragonFly__) \
-                                || defined(__APPLE__))) \
+                                || defined(__APPLE__) || defined(_AIX))) \
     || defined(HAVE_READV) || defined(HAVE_PREADV) || defined (HAVE_PREADV2) \
     || defined(HAVE_WRITEV) || defined(HAVE_PWRITEV) || defined (HAVE_PWRITEV2)
 static int

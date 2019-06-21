@@ -889,6 +889,9 @@
 /* Define to 1 if you have the `sendfile' function. */
 #undef HAVE_SENDFILE
 
+/* Define to 1 if you have the `send_file' function. */
+#undef HAVE_SEND_FILE
+
 /* Define to 1 if you have the `setegid' function. */
 #undef HAVE_SETEGID
 
@@ -1158,6 +1161,9 @@
 
 /* Define to 1 if you have the <sys/sendfile.h> header file. */
 #undef HAVE_SYS_SENDFILE_H
+
+/* Define to 1 if you have the <sys/send_file.h> header file. */
+#undef HAVE_SYS_SEND_FILE_H
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #undef HAVE_SYS_SOCKET_H
