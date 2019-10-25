@@ -90,7 +90,15 @@ def get_platform ():
     elif osname[:4] == "irix":              # could be "irix64"!
         return "%s-%s" % (osname, release)
     elif osname[:3] == "aix":
-        return "%s-%s.%s" % (osname, version, release)
+        # bootstrap: during build _posixsubprocess may be unavailable
+        # _aix_support imports subprocess that wants _posixsubprocess
+        # during bootstrap provide a simple tag
+        try:
+            from _aix_support import get_platform as aix_platform
+        except ModuleNotFoundError:
+            return "%s-%s.%s" % (osname, version, release)
+        else:
+            return aix_platform()
     elif osname[:6] == "cygwin":
         osname = "cygwin"
         rel_re = re.compile (r'[\d.]+', re.ASCII)
