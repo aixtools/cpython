@@ -675,7 +675,8 @@ def get_platform():
     elif osname[:4] == "irix":              # could be "irix64"!
         return "%s-%s" % (osname, release)
     elif osname[:3] == "aix":
-        return "%s-%s.%s" % (osname, version, release)
+        from _aix_support import aix_platform
+        return aix_platform()
     elif osname[:6] == "cygwin":
         osname = "cygwin"
         import re
