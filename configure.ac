@@ -2910,11 +2910,23 @@ dnl The AIX_BUILDDATE is obtained from the kernel fileset - bos.mp64
 # BUILD_GNU_TYPE + AIX_BUILDDATE are used to construct the platform_tag
 # of the AIX system used to build/package Python executable. This tag serves
 # as a baseline for bdist module packages
-               AC_MSG_CHECKING(for the system builddate)
-               AIX_BUILDDATE=$(lslpp -Lcq bos.mp64 | awk -F:  '{ print $NF }')
-               AC_DEFINE_UNQUOTED([AIX_BUILDDATE], [$AIX_BUILDDATE],
-                   [BUILD_GNU_TYPE + AIX_BUILDDATE are used to construct the PEP425 tag of the build system.])
-               AC_MSG_RESULT($AIX_BUILDDATE)
+		AC_MSG_CHECKING(for the AIX system builddate)
+		AIX_BUILDDATE=$(lslpp -Lcq bos.mp64 | awk -F:  '{ print $NF }')
+		AC_DEFINE_UNQUOTED([AIX_BUILDDATE], [$AIX_BUILDDATE],
+		    [BUILD_GNU_TYPE + AIX_BUILDDATE are used to construct the PEP425 tag of the build system.])
+		AC_MSG_RESULT($AIX_BUILDDATE)
+dnl In AIX IV95512 changed it's handling of IEEE754 nextafter()
+dnl This value is used in Modules/mathmodule.c to determine when to use normal/exceptional handling
+dnl of the nextafter() function
+		AC_MSG_CHECKING(for IV95512 patch)
+		instfix -iqk IV95512
+		if [[ $? == 0 ]]; then
+		    AC_DEFINE([_AIX_IV95512], 1,
+			[_AIX_IV95512 is used in Modules/mathmodule.c to establish how to handle nextafter])
+		    AC_MSG_RESULT(yes)
+		else
+		    AC_MSG_RESULT(no)
+		fi
                ;;
 	*) ;;
 esac

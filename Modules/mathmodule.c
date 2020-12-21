@@ -3467,7 +3467,7 @@ static PyObject *
 math_nextafter_impl(PyObject *module, double x, double y)
 /*[clinic end generated code: output=750c8266c1c540ce input=02b2d50cd1d9f9b6]*/
 {
-#if defined(_AIX)
+#if defined(_AIX) && !defined(_AIX_IV95512)
     if (x == y) {
         /* On AIX 7.1, libm nextafter(-0.0, +0.0) returns -0.0.
            Bug fixed in bos.adt.libm 7.2.2.0 by APAR IV95512. */
