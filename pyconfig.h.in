@@ -1582,6 +1582,10 @@
 /* Define if arithmetic is subject to x87-style double rounding issue */
 #undef X87_DOUBLE_ROUNDING
 
+/* _AIX_IV95512 is used in Modules/mathmodule.c to establish how to handle
+   nextafter */
+#undef _AIX_IV95512
+
 /* Define on OpenBSD to activate all library features */
 #undef _BSD_SOURCE
 
