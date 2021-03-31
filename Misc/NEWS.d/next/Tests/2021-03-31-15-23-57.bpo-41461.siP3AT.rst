@@ -1,0 +1,5 @@
+Update `test_pathlib.test_open_mode` and `test_pathlib.test_touch_mode` 
+Not all filesystems (e.g., NFS) permit a global write on file creation.
+Modify the initial umask() from 0o0 to 0o007 to eliminate false failures
+due to filesystems preventing global write.
+Patch by M. Felt.

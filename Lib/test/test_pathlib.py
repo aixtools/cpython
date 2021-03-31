@@ -2391,13 +2391,15 @@ class PosixPathTest(_BasePathTest, unittest.TestCase):
             print(path.resolve(strict))
 
     def test_open_mode(self):
-        old_mask = os.umask(0)
+        # bpo-41461: some filesystems, e.g. NFS, may refuse world-write bit
+        # As a mask of 0 is known to fail - mask all world bits instead
+        old_mask = os.umask(0o007)
         self.addCleanup(os.umask, old_mask)
         p = self.cls(BASE)
         with (p / 'new_file').open('wb'):
             pass
         st = os.stat(join('new_file'))
-        self.assertEqual(stat.S_IMODE(st.st_mode), 0o666)
+        self.assertEqual(stat.S_IMODE(st.st_mode), 0o660)
         os.umask(0o022)
         with (p / 'other_new_file').open('wb'):
             pass
@@ -2414,12 +2416,13 @@ class PosixPathTest(_BasePathTest, unittest.TestCase):
             os.chdir(current_directory)
 
     def test_touch_mode(self):
-        old_mask = os.umask(0)
+        # see comments for test_open_mode
+        old_mask = os.umask(0o007)
         self.addCleanup(os.umask, old_mask)
         p = self.cls(BASE)
         (p / 'new_file').touch()
         st = os.stat(join('new_file'))
-        self.assertEqual(stat.S_IMODE(st.st_mode), 0o666)
+        self.assertEqual(stat.S_IMODE(st.st_mode), 0o660)
         os.umask(0o022)
         (p / 'other_new_file').touch()
         st = os.stat(join('other_new_file'))
